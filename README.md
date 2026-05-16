@@ -1,6 +1,6 @@
 # Website Detection AI Agent
 
-An AI-powered tool for automatically detecting IP infringements on websites. The system crawls Google search results based on configurable keywords and analyzes each found URL with Gemini 2.5 Flash for potential trademark or product piracy — fully automated via Make.com, Airtable, and a Node.js/React backend.
+An AI-powered tool for automatically detecting IP infringements on websites. The system searches Google for configurable keywords, scrapes each result, and analyzes it with Gemini 2.5 Flash for potential trademark or product piracy — fully automated, no third-party automation tools required.
 
 ---
 
@@ -11,74 +11,93 @@ An AI-powered tool for automatically detecting IP infringements on websites. The
 │  React Frontend  │ ────────────► │  Node.js/Express Backend │
 │  (search + results)              │  /api/search/*           │
 └──────────────────┘               │  /api/extract            │
-                                   └──────────┬───────────────┘
-                                              │ Webhook
-                                              ▼
-                                   ┌──────────────────────────┐
-                                   │       Make.com           │
-                                   │  6 Scenarios             │
-                                   └──────────┬───────────────┘
-                                              │ Read/Write
-                                              ▼
-                                   ┌──────────────────────────┐
-                                   │        Airtable          │
-                                   │  Keywords / Sightings /  │
-                                   │  AI Prompt Config        │
-                                   └──────────────────────────┘
+                                   └──────┬──────┬────────────┘
+                                          │      │
+                              ┌───────────┘      └───────────┐
+                              ▼                              ▼
+                   ┌──────────────────┐         ┌──────────────────┐
+                   │    Airtable      │         │    SerpAPI       │
+                   │  Keywords /      │         │  Google Search   │
+                   │  Sightings /     │         └──────────────────┘
+                   │  AI Prompts      │
+                   └──────────────────┘
+                              ▲
+                              │
+                   ┌──────────────────┐
+                   │  Gemini 2.5 Flash│
+                   │  (AI Analysis)   │
+                   └──────────────────┘
 ```
 
-Full architecture and data flow documentation: [`docs/architecture.md`](docs/architecture.md)
+**Make.com is no longer required.** All logic runs natively in Node.js. See [`make-blueprints/README.md`](make-blueprints/README.md) for the migration reference.
 
 ---
 
 ## Prerequisites
 
 - **Node.js** 18+
-- **Make.com** account (free tier is sufficient for testing)
 - **Airtable** account + base (Base ID: `appgyHtu4tSQxWCvz`)
-- **SerpAPI** key (for URL Importer / AI Worker V1.2.1)
-- **Google AI API key** (Gemini 2.5 Flash) — configured as a Make.com connection
+- **SerpAPI** key ([serpapi.com](https://serpapi.com))
+- **Google Gemini API key** ([aistudio.google.com](https://aistudio.google.com))
 
 ---
 
-## Setup Guide
+## Quick Start
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/hendrikschueler-svg/website-detection-ai-agent.git
-cd website-detection-ai-agent
+cd website-detection-ai-agent/web-app
 ```
 
-### 2. Start the web app locally
+### 2. Configure environment variables
 
 ```bash
-cd web-app
 cp ../.env.example .env
-# Fill in your values (see Step 5)
+```
 
+Edit `web-app/.env`:
+
+```env
+MOCK_MODE=false
+
+AIRTABLE_TOKEN=your_airtable_personal_access_token
+AIRTABLE_BASE_ID=appgyHtu4tSQxWCvz
+
+SERPAPI_KEY=your_serpapi_key
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+### 3. Install dependencies and start
+
+```bash
 npm install
 npm run dev
 # App runs on http://localhost:5000
 ```
 
-### 3. Import Make.com blueprints
+---
 
-1. Open [make.com](https://make.com) → Login
-2. **Scenarios** → **Create a new scenario**
-3. Bottom left: click **Import Blueprint**
-4. Import blueprints in this order (from `make-blueprints/`):
-   - `01-airtable-get-options.json`
-   - `02-url-importer.json`
-   - `03-start-search.json`
-   - `04-get-results.json`
-   - `06-ai-worker-v1.2.2-scraping-alt.json` ← **active AI Worker**
-5. In each scenario: select your Airtable connection and base
-6. Copy the webhook URLs from scenarios 01, 03, and 04
+## Mock Mode (no API keys required)
 
-Detailed import instructions: [`make-blueprints/README.md`](make-blueprints/README.md)
+The app ships with a **Mock Mode** for local development and demos — no Airtable, SerpAPI, or Gemini account needed.
 
-### 4. Set up Airtable
+```env
+# web-app/.env
+MOCK_MODE=true
+```
+
+When `MOCK_MODE=true`:
+- `/api/search/options` returns two pre-configured clients (*Acme Sports*, *LuxBrand*) with realistic products and keywords
+- `/api/search/start` returns a mock `runId` instantly
+- `/api/search/results/:runId` returns realistic sightings with mixed Risk Scores, Infringement Types, and Reasoning Summaries
+
+All other environment variables are ignored in mock mode.
+
+---
+
+## Airtable Setup
 
 The base must contain three tables:
 
@@ -90,53 +109,17 @@ The base must contain three tables:
 
 All fields and types: [`docs/airtable-schema.md`](docs/airtable-schema.md)
 
-### 5. Set environment variables
-
-```bash
-# web-app/.env
-MAKE_API_KEY=your_make_api_key
-
-# Webhook URLs from Step 3:
-MAKE_START_SEARCH_URL=https://hook.eu2.make.com/...   # Scenario 03 (root route)
-MAKE_GET_RESULTS_URL=https://hook.eu2.make.com/...    # Scenario 04 (root route)
-START_SEARCH_URL=https://hook.eu2.make.com/...        # Scenario 03 (/api/search/start)
-GET_RESULTS_URL=https://hook.eu2.make.com/...         # Scenario 04 (/api/search/results)
-```
-
-Find your `MAKE_API_KEY` in Make.com under **Organization Settings → API**.
-
-### 6. Deploy (Railway / Render / Replit)
-
-```bash
-# Build
-cd web-app && npm run build
-
-# Start (production)
-npm run start
-```
-
-The app reads `PORT` from the environment (default: `5000`).  
-For AI Worker V1.2.2, the `/api/extract` endpoint URL in Make.com scenario 06 must point to your deployment URL.
-
 ---
 
-## Local Development / Demo Mode
+## How It Works
 
-The app ships with a **Mock Mode** that runs entirely without a Make.com subscription, SerpAPI key, or Airtable account — useful for local development, demos, or UI testing.
+1. **Search** — User selects a keyword setup (Client + Product + Keyword) and starts a scan
+2. **URL Import** — Backend calls SerpAPI to fetch Google results and creates a "pending" sighting in Airtable for each URL
+3. **AI Analysis** — Each URL is scraped (`/api/extract`) and the content is sent to Gemini 2.5 Flash with a configurable prompt
+4. **Results** — Gemini returns a structured JSON analysis (Risk Score, Infringement Type, Reasoning, Recommended Action) which is written back to Airtable
+5. **Polling** — The frontend polls `/api/search/results/:runId` every few seconds until all sightings are processed
 
-**Enable it:**
-
-```bash
-# web-app/.env
-MOCK_MODE=true
-```
-
-When `MOCK_MODE=true`:
-- `/api/search/options` returns two pre-configured clients (*Acme Sports*, *LuxBrand*) with realistic products and keywords
-- `/api/search/start` returns a mock `runId` instantly without calling Make.com
-- `/api/search/results/:runId` returns a set of realistic sightings with mixed Risk Scores, Infringement Types, and Reasoning Summaries
-
-All other environment variables (`MAKE_API_KEY`, webhook URLs) are ignored in mock mode and do not need to be set.
+The scan runs as a **background job** — the API returns a `runId` immediately and the client polls for results.
 
 ---
 
@@ -148,15 +131,15 @@ Returns available clients, products, and keywords from Airtable.
 **Response:**
 ```json
 {
-  "clients": ["Vitra", "Herman Miller"],
-  "products": ["Lounge Chair", "Aeron"],
-  "keywords": ["Eames Replica buy"],
-  "setups": [{ "id": "recXXX", "Client": "Vitra", "Product Name": "Lounge Chair", "Keyword": "..." }]
+  "clients": ["Acme Sports"],
+  "products": ["ProRunner X1"],
+  "keywords": ["ProRunner X1 buy cheap"],
+  "setups": [{ "id": "recXXX", "Client": "Acme Sports", "Product Name": "ProRunner X1", "Keyword": "..." }]
 }
 ```
 
 ### `POST /api/search/start`
-Starts a new scan run. Triggers Make.com scenario 03.
+Starts a new scan. Runs URL import + AI analysis as a background job.
 
 **Body:** `{ "setupRecordId": "recXXX" }`  
 **Response:** `{ "runId": "uuid-v4" }`
@@ -172,6 +155,7 @@ Returns the current state of all sightings for a given run.
     "URL": "https://...",
     "Status": "Takedown Recommended",
     "Risk Score": 0.9,
+    "Confidence Score": 0.85,
     "Infringement Type": "counterfeit",
     "Reasoning Summary": "...",
     "Recommended Action": "escalate"
@@ -180,31 +164,38 @@ Returns the current state of all sightings for a given run.
 ```
 
 ### `POST /api/extract`
-Scrapes a URL and returns visible text + diagnostics (used by Make.com AI Worker V1.2.2).
+Scrapes a URL and returns visible text + metadata.
 
 **Body:** `{ "url": "https://..." }`  
-**Response:** `{ "visibleTextExcerpt": "...", "pageTitle": "...", "diagnostics": { ... } }`
+**Response:** `{ "visibleTextExcerpt": "...", "pageTitle": "...", "h1": "...", "diagnostics": { ... } }`
 
 ### `GET /api/health`
-Health check. **Response:** `{ "ok": true }`
+Health check. **Response:** `{ "ok": true, "mock": false }`
+
+---
+
+## Deployment
+
+```bash
+cd web-app
+npm run build
+npm run start
+```
+
+The app reads `PORT` from the environment (default: `5000`).
 
 ---
 
 ## Troubleshooting
 
-**401 from Make.com**  
-→ Check `MAKE_API_KEY`. Make.com expects the key as an `X-Make-ApiKey` header — no "Bearer" prefix.
+**Bot-blocking / empty page content**  
+→ The target website blocks direct HTTP requests. Indicated by `suspectedBlocking: true` in the `/api/extract` diagnostics.
 
-**Bot-blocking on `/api/extract`**  
-→ The target website is blocking direct HTTP requests. Switch to AI Worker V1.2.1 (ScrapingBee).  
-Indicated by `suspectedBlocking: true` in the diagnostics response.
+**JS-rendered pages — empty `visibleTextExcerpt`**  
+→ `/api/extract` does not execute JavaScript. Indicated by `suspectedJsRendering: true`.
 
-**JS-only pages — empty `visibleTextExcerpt`**  
-→ `/api/extract` cannot execute JavaScript. Indicated by `suspectedJsRendering: true`.  
-AI Worker V1.2.1 (ScrapingBee) supports JavaScript rendering.
+**Gemini returns invalid JSON**  
+→ The server falls back to stripping markdown code fences and retrying the parse. Check server logs for `[gemini] JSON parse error`.
 
-**Make.com returns invalid JSON / parse error**  
-→ Make.com occasionally returns multiple JSON objects instead of an array. The `callMakeWebhook` helper in `server/makeWebhook.ts` normalizes these cases automatically.
-
-**`runId` not found after scan start**  
-→ Make.com scenario 03 did not return a `runId`. Check the Make.com scenario history logs.
+**`runId` results always empty**  
+→ Check that the background job completed without errors. Server logs show `[aiWorker]` and `[urlImporter]` progress per sighting.
