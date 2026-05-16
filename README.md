@@ -1,10 +1,10 @@
 # Website Detection AI Agent
 
-Ein KI-gestütztes Tool zur automatischen Erkennung von IP-Verletzungen auf Websites. Das System crawlt Google-Suchergebnisse anhand konfigurierbarer Keywords und analysiert jede gefundene URL per Gemini 2.5 Flash auf potenzielle Marken- oder Produktpiraterie — vollständig automatisiert über Make.com, Airtable und ein Node.js/React-Backend.
+An AI-powered tool for automatically detecting IP infringements on websites. The system crawls Google search results based on configurable keywords and analyzes each found URL with Gemini 2.5 Flash for potential trademark or product piracy — fully automated via Make.com, Airtable, and a Node.js/React backend.
 
 ---
 
-## Systemarchitektur
+## System Architecture
 
 ```
 ┌──────────────────┐     HTTP      ┌──────────────────────────┐
@@ -16,7 +16,7 @@ Ein KI-gestütztes Tool zur automatischen Erkennung von IP-Verletzungen auf Webs
                                               ▼
                                    ┌──────────────────────────┐
                                    │       Make.com           │
-                                   │  6 Szenarien             │
+                                   │  6 Scenarios             │
                                    └──────────┬───────────────┘
                                               │ Read/Write
                                               ▼
@@ -27,122 +27,122 @@ Ein KI-gestütztes Tool zur automatischen Erkennung von IP-Verletzungen auf Webs
                                    └──────────────────────────┘
 ```
 
-Vollständige Architektur- und Datenflussdokumentation: [`docs/architecture.md`](docs/architecture.md)
+Full architecture and data flow documentation: [`docs/architecture.md`](docs/architecture.md)
 
 ---
 
-## Voraussetzungen
+## Prerequisites
 
 - **Node.js** 18+
-- **Make.com** Account (Free-Tier reicht für Tests)
-- **Airtable** Account + Base (Base ID: `appgyHtu4tSQxWCvz`)
-- **SerpAPI** Key (für URL Importer / AI Worker V1.2.1)
-- **Google AI API Key** (Gemini 2.5 Flash) — in Make.com Verbindung konfiguriert
+- **Make.com** account (free tier is sufficient for testing)
+- **Airtable** account + base (Base ID: `appgyHtu4tSQxWCvz`)
+- **SerpAPI** key (for URL Importer / AI Worker V1.2.1)
+- **Google AI API key** (Gemini 2.5 Flash) — configured as a Make.com connection
 
 ---
 
-## Setup-Anleitung
+## Setup Guide
 
-### 1. Repo klonen
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/hendrikschueler-svg/website-detection-ai-agent.git
 cd website-detection-ai-agent
 ```
 
-### 2. Web App lokal starten
+### 2. Start the web app locally
 
 ```bash
 cd web-app
 cp ../.env.example .env
-# .env mit deinen Werten befüllen (siehe Schritt 5)
+# Fill in your values (see Step 5)
 
 npm install
 npm run dev
-# App läuft auf http://localhost:5000
+# App runs on http://localhost:5000
 ```
 
-### 3. Make.com Blueprints importieren
+### 3. Import Make.com blueprints
 
-1. [make.com](https://make.com) öffnen → Login
+1. Open [make.com](https://make.com) → Login
 2. **Scenarios** → **Create a new scenario**
-3. Unten links: **Import Blueprint** klicken
-4. Blueprints in dieser Reihenfolge importieren (aus `make-blueprints/`):
+3. Bottom left: click **Import Blueprint**
+4. Import blueprints in this order (from `make-blueprints/`):
    - `01-airtable-get-options.json`
    - `02-url-importer.json`
    - `03-start-search.json`
    - `04-get-results.json`
-   - `06-ai-worker-v1.2.2-scraping-alt.json` ← **aktiver AI Worker**
-5. In jedem Szenario: Airtable-Verbindung + Base auswählen
-6. Webhook-URLs der Szenarien 01, 03 und 04 notieren
+   - `06-ai-worker-v1.2.2-scraping-alt.json` ← **active AI Worker**
+5. In each scenario: select your Airtable connection and base
+6. Copy the webhook URLs from scenarios 01, 03, and 04
 
-Detaillierte Import-Anleitung: [`make-blueprints/README.md`](make-blueprints/README.md)
+Detailed import instructions: [`make-blueprints/README.md`](make-blueprints/README.md)
 
-### 4. Airtable einrichten
+### 4. Set up Airtable
 
-Die Base muss drei Tabellen enthalten:
+The base must contain three tables:
 
-| Tabelle | Table ID | Inhalt |
+| Table | Table ID | Contents |
 |---|---|---|
-| Search Setup Keywords | `tblR4mgEXIUJFiTbL` | Client + Produkt + Keyword |
-| Sightings Overview | `tblux7nvqO6Yg9t88` | Gefundene URLs + KI-Ergebnisse |
-| AI Prompt Config | `tblEdFKZi1o0kYuTR` | Gemini-Prompts |
+| Search Setup Keywords | `tblR4mgEXIUJFiTbL` | Client + Product + Keyword |
+| Sightings Overview | `tblux7nvqO6Yg9t88` | Found URLs + AI results |
+| AI Prompt Config | `tblEdFKZi1o0kYuTR` | Gemini prompts |
 
-Alle Felder und Typen: [`docs/airtable-schema.md`](docs/airtable-schema.md)
+All fields and types: [`docs/airtable-schema.md`](docs/airtable-schema.md)
 
-### 5. Umgebungsvariablen setzen
+### 5. Set environment variables
 
 ```bash
 # web-app/.env
-MAKE_API_KEY=dein_make_api_key
+MAKE_API_KEY=your_make_api_key
 
-# Webhook-URLs aus Schritt 3 eintragen:
-MAKE_START_SEARCH_URL=https://hook.eu2.make.com/...   # Szenario 03 (Root-Route)
-MAKE_GET_RESULTS_URL=https://hook.eu2.make.com/...    # Szenario 04 (Root-Route)
-START_SEARCH_URL=https://hook.eu2.make.com/...        # Szenario 03 (/api/search/start)
-GET_RESULTS_URL=https://hook.eu2.make.com/...         # Szenario 04 (/api/search/results)
+# Webhook URLs from Step 3:
+MAKE_START_SEARCH_URL=https://hook.eu2.make.com/...   # Scenario 03 (root route)
+MAKE_GET_RESULTS_URL=https://hook.eu2.make.com/...    # Scenario 04 (root route)
+START_SEARCH_URL=https://hook.eu2.make.com/...        # Scenario 03 (/api/search/start)
+GET_RESULTS_URL=https://hook.eu2.make.com/...         # Scenario 04 (/api/search/results)
 ```
 
-Den `MAKE_API_KEY` findest du in Make.com unter **Organization Settings → API**.
+Find your `MAKE_API_KEY` in Make.com under **Organization Settings → API**.
 
-### 6. Deployment (Replit / Railway / Render)
+### 6. Deploy (Railway / Render / Replit)
 
 ```bash
 # Build
 cd web-app && npm run build
 
-# Start (Production)
+# Start (production)
 npm run start
 ```
 
-Die App erwartet `PORT` als Umgebungsvariable (Default: `5000`).  
-Für den AI Worker V1.2.2 muss die `/api/extract` Endpunkt-URL in Make.com Szenario 06 auf deine deployment URL zeigen.
+The app reads `PORT` from the environment (default: `5000`).  
+For AI Worker V1.2.2, the `/api/extract` endpoint URL in Make.com scenario 06 must point to your deployment URL.
 
 ---
 
-## API-Dokumentation
+## API Reference
 
 ### `GET /api/search/options`
-Gibt verfügbare Clients, Produkte und Keywords aus Airtable zurück.
+Returns available clients, products, and keywords from Airtable.
 
 **Response:**
 ```json
 {
   "clients": ["Vitra", "Herman Miller"],
   "products": ["Lounge Chair", "Aeron"],
-  "keywords": ["Eames Replica kaufen"],
+  "keywords": ["Eames Replica buy"],
   "setups": [{ "id": "recXXX", "Client": "Vitra", "Product Name": "Lounge Chair", "Keyword": "..." }]
 }
 ```
 
 ### `POST /api/search/start`
-Startet einen neuen Scan-Lauf. Triggert Make.com Szenario 03.
+Starts a new scan run. Triggers Make.com scenario 03.
 
 **Body:** `{ "setupRecordId": "recXXX" }`  
 **Response:** `{ "runId": "uuid-v4" }`
 
 ### `GET /api/search/results/:runId`
-Gibt den aktuellen Stand aller Sightings für einen Lauf zurück.
+Returns the current state of all sightings for a given run.
 
 **Response:**
 ```json
@@ -160,31 +160,31 @@ Gibt den aktuellen Stand aller Sightings für einen Lauf zurück.
 ```
 
 ### `POST /api/extract`
-Scrapet eine URL und gibt sichtbaren Text + Diagnose zurück (genutzt von Make.com AI Worker V1.2.2).
+Scrapes a URL and returns visible text + diagnostics (used by Make.com AI Worker V1.2.2).
 
 **Body:** `{ "url": "https://..." }`  
 **Response:** `{ "visibleTextExcerpt": "...", "pageTitle": "...", "diagnostics": { ... } }`
 
 ### `GET /api/health`
-Health Check. **Response:** `{ "ok": true }`
+Health check. **Response:** `{ "ok": true }`
 
 ---
 
 ## Troubleshooting
 
-**401 von Make.com**  
-→ `MAKE_API_KEY` prüfen. Make.com erwartet den Key als `X-Make-ApiKey` Header — kein "Bearer" Prefix.
+**401 from Make.com**  
+→ Check `MAKE_API_KEY`. Make.com expects the key as an `X-Make-ApiKey` header — no "Bearer" prefix.
 
-**Bot-Blocking bei `/api/extract`**  
-→ Die Ziel-Website blockiert direkte HTTP-Requests. Wechsel auf AI Worker V1.2.1 (ScrapingBee).  
-Erkennbar an `suspectedBlocking: true` in der diagnostics-Antwort.
+**Bot-blocking on `/api/extract`**  
+→ The target website is blocking direct HTTP requests. Switch to AI Worker V1.2.1 (ScrapingBee).  
+Indicated by `suspectedBlocking: true` in the diagnostics response.
 
-**JS-only Seiten — leerer `visibleTextExcerpt`**  
-→ `/api/extract` kann kein JavaScript rendern. Erkennbar an `suspectedJsRendering: true`.  
-AI Worker V1.2.1 (ScrapingBee) kann JavaScript-Rendering aktivieren.
+**JS-only pages — empty `visibleTextExcerpt`**  
+→ `/api/extract` cannot execute JavaScript. Indicated by `suspectedJsRendering: true`.  
+AI Worker V1.2.1 (ScrapingBee) supports JavaScript rendering.
 
-**Make.com gibt kein JSON zurück / Parse-Fehler**  
-→ Make.com sendet gelegentlich mehrere JSON-Objekte statt eines Arrays. Der `callMakeWebhook` Helper in `server/makeWebhook.ts` normalisiert diese Fälle automatisch.
+**Make.com returns invalid JSON / parse error**  
+→ Make.com occasionally returns multiple JSON objects instead of an array. The `callMakeWebhook` helper in `server/makeWebhook.ts` normalizes these cases automatically.
 
-**`runId` nicht gefunden nach Scan-Start**  
-→ Make.com Szenario 03 gibt keinen `runId` zurück. Make.com Logs prüfen (Scenario → History).
+**`runId` not found after scan start**  
+→ Make.com scenario 03 did not return a `runId`. Check the Make.com scenario history logs.
