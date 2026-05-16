@@ -1,0 +1,2447 @@
+{
+    "name": "Website Detection - URL Importer",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 3924824,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "URL_IMPORTER_START_V2"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "runId",
+                        "type": "text"
+                    },
+                    {
+                        "name": "setupRecordId",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 11,
+            "module": "airtable:ActionGetRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 13734578
+            },
+            "mapper": {
+                "id": "{{1.setupRecordId}}",
+                "base": "appgyHtu4tSQxWCvz",
+                "table": "tblR4mgEXIUJFiTbL",
+                "useColumnId": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "base": {
+                            "mode": "chose",
+                            "label": "Website AI Agent IP Check"
+                        },
+                        "table": {
+                            "mode": "chose",
+                            "label": "Search Setup Keywords"
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection (User ID: usrNZrEbImPW4456n)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:airtable3,airtable2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "base",
+                        "type": "select",
+                        "label": "Base",
+                        "required": true
+                    },
+                    {
+                        "name": "useColumnId",
+                        "type": "boolean",
+                        "label": "Use Column ID",
+                        "required": true
+                    },
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "Record ID",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "ID"
+                    },
+                    {
+                        "name": "createdTime",
+                        "type": "date",
+                        "label": "Created Time"
+                    },
+                    {
+                        "name": "Keyword",
+                        "type": "text",
+                        "label": "Keyword"
+                    },
+                    {
+                        "name": "Active",
+                        "type": "boolean",
+                        "label": "Active"
+                    },
+                    {
+                        "name": "Engine",
+                        "type": "text",
+                        "label": "Engine"
+                    },
+                    {
+                        "name": "Geolocation",
+                        "type": "text",
+                        "label": "Geolocation"
+                    },
+                    {
+                        "name": "Language Code",
+                        "type": "text",
+                        "label": "Language Code"
+                    },
+                    {
+                        "name": "Client",
+                        "type": "text",
+                        "label": "Client"
+                    },
+                    {
+                        "name": "Location",
+                        "type": "text",
+                        "label": "Location"
+                    },
+                    {
+                        "name": "Google Domain",
+                        "type": "array",
+                        "label": "Google Domain",
+                        "dynamic": true,
+                        "editable": true
+                    },
+                    {
+                        "name": "Official Domain",
+                        "type": "text",
+                        "label": "Official Domain"
+                    },
+                    {
+                        "name": "Product Name",
+                        "type": "text",
+                        "label": "Product Name"
+                    },
+                    {
+                        "name": "Market",
+                        "type": "text",
+                        "label": "Market"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 6,
+            "module": "serpapi:searchGoogle",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 13734780
+            },
+            "mapper": {
+                "q": "{{11.Keyword}}",
+                "gl": "{{11.Geolocation}}",
+                "hl": "{{11.`Language Code`}}",
+                "num": "10",
+                "start": "0",
+                "filter": true,
+                "location": "{{11.Location}}",
+                "google_domain": "{{11.`Google Domain`}}",
+                "pagination_limit": "1"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "gl": {
+                            "mode": "edit"
+                        },
+                        "hl": {
+                            "mode": "edit"
+                        },
+                        "tbm": {
+                            "mode": "chose",
+                            "label": "Empty"
+                        },
+                        "nfpr": {
+                            "mode": "chose"
+                        },
+                        "safe": {
+                            "mode": "chose",
+                            "label": "Empty"
+                        },
+                        "filter": {
+                            "mode": "chose"
+                        },
+                        "no_cache": {
+                            "mode": "chose"
+                        },
+                        "google_domain": {
+                            "mode": "edit"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "serpapi"
+                            },
+                            "label": "My SerpApi connection (hendrik.schueler@gmail.com)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:serpapi",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "q",
+                        "type": "text",
+                        "label": "`q` Search Query",
+                        "required": true
+                    },
+                    {
+                        "name": "location",
+                        "type": "text",
+                        "label": "`location` Location"
+                    },
+                    {
+                        "name": "uule",
+                        "type": "text",
+                        "label": "`uule` Encoded Location"
+                    },
+                    {
+                        "name": "start",
+                        "type": "number",
+                        "label": "`start` Result Offset"
+                    },
+                    {
+                        "name": "num",
+                        "type": "number",
+                        "label": "`num` Number of Results"
+                    },
+                    {
+                        "name": "pagination_limit",
+                        "type": "number",
+                        "label": "Pagination Limit",
+                        "required": true
+                    },
+                    {
+                        "name": "google_domain",
+                        "type": "select",
+                        "label": "`google_domain` Domain",
+                        "validate": {
+                            "enum": [
+                                "google.com",
+                                "google.ad",
+                                "google.ae",
+                                "google.com.af",
+                                "google.com.ag",
+                                "google.com.ai",
+                                "google.al",
+                                "google.am",
+                                "google.co.ao",
+                                "google.com.ar",
+                                "google.as",
+                                "google.at",
+                                "google.com.au",
+                                "google.az",
+                                "google.ba",
+                                "google.com.bd",
+                                "google.be",
+                                "google.bf",
+                                "google.bg",
+                                "google.com.bh",
+                                "google.bi",
+                                "google.bj",
+                                "google.com.bn",
+                                "google.com.bo",
+                                "google.com.br",
+                                "google.bs",
+                                "google.bt",
+                                "google.co.bw",
+                                "google.by",
+                                "google.com.bz",
+                                "google.ca",
+                                "google.com.kh",
+                                "google.cd",
+                                "google.cf",
+                                "google.cg",
+                                "google.ch",
+                                "google.ci",
+                                "google.co.ck",
+                                "google.cl",
+                                "google.cm",
+                                "google.com.co",
+                                "google.co.cr",
+                                "google.com.cu",
+                                "google.cv",
+                                "google.com.cy",
+                                "google.cz",
+                                "google.de",
+                                "google.dj",
+                                "google.dk",
+                                "google.dm",
+                                "google.com.do",
+                                "google.dz",
+                                "google.com.ec",
+                                "google.ee",
+                                "google.com.eg",
+                                "google.es",
+                                "google.com.et",
+                                "google.fi",
+                                "google.fm",
+                                "google.com.fj",
+                                "google.fr",
+                                "google.ga",
+                                "google.ge",
+                                "google.com.gh",
+                                "google.com.gi",
+                                "google.gl",
+                                "google.gm",
+                                "google.gp",
+                                "google.gr",
+                                "google.com.gt",
+                                "google.gy",
+                                "google.com.hk",
+                                "google.hn",
+                                "google.hr",
+                                "google.ht",
+                                "google.hu",
+                                "google.co.id",
+                                "google.iq",
+                                "google.ie",
+                                "google.co.il",
+                                "google.co.in",
+                                "google.is",
+                                "google.it",
+                                "google.com.jm",
+                                "google.jo",
+                                "google.co.jp",
+                                "google.co.ke",
+                                "google.ki",
+                                "google.kg",
+                                "google.co.kr",
+                                "google.com.kw",
+                                "google.kz",
+                                "google.la",
+                                "google.com.lb",
+                                "google.li",
+                                "google.lk",
+                                "google.co.ls",
+                                "google.lt",
+                                "google.lu",
+                                "google.lv",
+                                "google.com.ly",
+                                "google.co.ma",
+                                "google.md",
+                                "google.mg",
+                                "google.mk",
+                                "google.ml",
+                                "google.com.mm",
+                                "google.mn",
+                                "google.ms",
+                                "google.com.mt",
+                                "google.mu",
+                                "google.mv",
+                                "google.mw",
+                                "google.com.mx",
+                                "google.com.my",
+                                "google.co.mz",
+                                "google.com.na",
+                                "google.ne",
+                                "google.com.ng",
+                                "google.com.ni",
+                                "google.nl",
+                                "google.no",
+                                "google.com.np",
+                                "google.nr",
+                                "google.nu",
+                                "google.co.nz",
+                                "google.com.om",
+                                "google.com.pk",
+                                "google.com.pa",
+                                "google.com.pe",
+                                "google.com.ph",
+                                "google.pl",
+                                "google.com.pg",
+                                "google.com.pr",
+                                "google.ps",
+                                "google.pt",
+                                "google.com.py",
+                                "google.com.qa",
+                                "google.ro",
+                                "google.rs",
+                                "google.ru",
+                                "google.rw",
+                                "google.com.sa",
+                                "google.com.sb",
+                                "google.sc",
+                                "google.se",
+                                "google.com.sg",
+                                "google.sh",
+                                "google.si",
+                                "google.sk",
+                                "google.com.sl",
+                                "google.sn",
+                                "google.sm",
+                                "google.so",
+                                "google.sr",
+                                "google.com.sv",
+                                "google.td",
+                                "google.tg",
+                                "google.co.th",
+                                "google.com.tj",
+                                "google.tk",
+                                "google.tl",
+                                "google.tm",
+                                "google.to",
+                                "google.tn",
+                                "google.com.tr",
+                                "google.tt",
+                                "google.com.tw",
+                                "google.co.tz",
+                                "google.com.ua",
+                                "google.co.ug",
+                                "google.co.uk",
+                                "google.com.uy",
+                                "google.co.uz",
+                                "google.com.vc",
+                                "google.co.ve",
+                                "google.vg",
+                                "google.co.vi",
+                                "google.com.vn",
+                                "google.vu",
+                                "google.ws",
+                                "google.co.za",
+                                "google.co.zm",
+                                "google.co.zw"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ludocid",
+                        "type": "text",
+                        "label": "`ludocid` Google Place ID"
+                    },
+                    {
+                        "name": "lsig",
+                        "type": "text",
+                        "label": "`lsig` Additional Google Place ID"
+                    },
+                    {
+                        "name": "kgmid",
+                        "type": "text",
+                        "label": "`kgmid` Google Knowledge Graph ID"
+                    },
+                    {
+                        "name": "si",
+                        "type": "text",
+                        "label": "`si` Google Cached Search Parameters ID"
+                    },
+                    {
+                        "name": "ibp",
+                        "type": "text",
+                        "label": "`ibp` Google Element Rendering"
+                    },
+                    {
+                        "name": "gl",
+                        "type": "select",
+                        "label": "`gl` Country",
+                        "validate": {
+                            "enum": [
+                                "af",
+                                "al",
+                                "dz",
+                                "as",
+                                "ad",
+                                "ao",
+                                "ai",
+                                "aq",
+                                "ag",
+                                "ar",
+                                "am",
+                                "aw",
+                                "au",
+                                "at",
+                                "az",
+                                "bs",
+                                "bh",
+                                "bd",
+                                "bb",
+                                "by",
+                                "be",
+                                "bz",
+                                "bj",
+                                "bm",
+                                "bt",
+                                "bo",
+                                "ba",
+                                "bw",
+                                "bv",
+                                "br",
+                                "io",
+                                "bn",
+                                "bg",
+                                "bf",
+                                "bi",
+                                "kh",
+                                "cm",
+                                "ca",
+                                "cv",
+                                "ky",
+                                "cf",
+                                "td",
+                                "cl",
+                                "cn",
+                                "cx",
+                                "cc",
+                                "co",
+                                "km",
+                                "cg",
+                                "cd",
+                                "ck",
+                                "cr",
+                                "ci",
+                                "hr",
+                                "cu",
+                                "cy",
+                                "cz",
+                                "dk",
+                                "dj",
+                                "dm",
+                                "do",
+                                "ec",
+                                "eg",
+                                "sv",
+                                "gq",
+                                "er",
+                                "ee",
+                                "et",
+                                "fk",
+                                "fo",
+                                "fj",
+                                "fi",
+                                "fr",
+                                "gf",
+                                "pf",
+                                "tf",
+                                "ga",
+                                "gm",
+                                "ge",
+                                "de",
+                                "gh",
+                                "gi",
+                                "gr",
+                                "gl",
+                                "gd",
+                                "gp",
+                                "gu",
+                                "gt",
+                                "gn",
+                                "gw",
+                                "gy",
+                                "ht",
+                                "hm",
+                                "va",
+                                "hn",
+                                "hk",
+                                "hu",
+                                "is",
+                                "in",
+                                "id",
+                                "ir",
+                                "iq",
+                                "ie",
+                                "il",
+                                "it",
+                                "jm",
+                                "jp",
+                                "jo",
+                                "kz",
+                                "ke",
+                                "ki",
+                                "kp",
+                                "kr",
+                                "kw",
+                                "kg",
+                                "la",
+                                "lv",
+                                "lb",
+                                "ls",
+                                "lr",
+                                "ly",
+                                "li",
+                                "lt",
+                                "lu",
+                                "mo",
+                                "mk",
+                                "mg",
+                                "mw",
+                                "my",
+                                "mv",
+                                "ml",
+                                "mt",
+                                "mh",
+                                "mq",
+                                "mr",
+                                "mu",
+                                "yt",
+                                "mx",
+                                "fm",
+                                "md",
+                                "mc",
+                                "mn",
+                                "ms",
+                                "ma",
+                                "mz",
+                                "mm",
+                                "na",
+                                "nr",
+                                "np",
+                                "nl",
+                                "an",
+                                "nc",
+                                "nz",
+                                "ni",
+                                "ne",
+                                "ng",
+                                "nu",
+                                "nf",
+                                "mp",
+                                "no",
+                                "om",
+                                "pk",
+                                "pw",
+                                "ps",
+                                "pa",
+                                "pg",
+                                "py",
+                                "pe",
+                                "ph",
+                                "pn",
+                                "pl",
+                                "pt",
+                                "pr",
+                                "qa",
+                                "re",
+                                "ro",
+                                "ru",
+                                "rw",
+                                "sh",
+                                "kn",
+                                "lc",
+                                "pm",
+                                "vc",
+                                "ws",
+                                "sm",
+                                "st",
+                                "sa",
+                                "sn",
+                                "rs",
+                                "sc",
+                                "sl",
+                                "sg",
+                                "sk",
+                                "si",
+                                "sb",
+                                "so",
+                                "za",
+                                "gs",
+                                "es",
+                                "lk",
+                                "sd",
+                                "sr",
+                                "sj",
+                                "sz",
+                                "se",
+                                "ch",
+                                "sy",
+                                "tw",
+                                "tj",
+                                "tz",
+                                "th",
+                                "tl",
+                                "tg",
+                                "tk",
+                                "to",
+                                "tt",
+                                "tn",
+                                "tr",
+                                "tm",
+                                "tc",
+                                "tv",
+                                "ug",
+                                "ua",
+                                "ae",
+                                "uk",
+                                "gb",
+                                "us",
+                                "um",
+                                "uy",
+                                "uz",
+                                "vu",
+                                "ve",
+                                "vn",
+                                "vg",
+                                "vi",
+                                "wf",
+                                "eh",
+                                "ye",
+                                "zm",
+                                "zw"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "hl",
+                        "type": "select",
+                        "label": "`hl` Language",
+                        "validate": {
+                            "enum": [
+                                "af",
+                                "ak",
+                                "sq",
+                                "ws",
+                                "am",
+                                "ar",
+                                "hy",
+                                "az",
+                                "eu",
+                                "be",
+                                "bem",
+                                "bn",
+                                "bh",
+                                "xx-bork",
+                                "bs",
+                                "br",
+                                "bg",
+                                "bt",
+                                "km",
+                                "ca",
+                                "chr",
+                                "ny",
+                                "zh-cn",
+                                "zh-tw",
+                                "co",
+                                "hr",
+                                "cs",
+                                "da",
+                                "nl",
+                                "xx-elmer",
+                                "en",
+                                "eo",
+                                "et",
+                                "ee",
+                                "fo",
+                                "tl",
+                                "fi",
+                                "fr",
+                                "fy",
+                                "gaa",
+                                "gl",
+                                "ka",
+                                "de",
+                                "el",
+                                "kl",
+                                "gn",
+                                "gu",
+                                "xx-hacker",
+                                "ht",
+                                "ha",
+                                "haw",
+                                "iw",
+                                "hi",
+                                "hu",
+                                "is",
+                                "ig",
+                                "id",
+                                "ia",
+                                "ga",
+                                "it",
+                                "ja",
+                                "jw",
+                                "kn",
+                                "kk",
+                                "rw",
+                                "rn",
+                                "xx-klingon",
+                                "kg",
+                                "ko",
+                                "kri",
+                                "ku",
+                                "ckb",
+                                "ky",
+                                "lo",
+                                "la",
+                                "lv",
+                                "ln",
+                                "lt",
+                                "loz",
+                                "lg",
+                                "ach",
+                                "mk",
+                                "mg",
+                                "ms",
+                                "ml",
+                                "mt",
+                                "mv",
+                                "mi",
+                                "mr",
+                                "mfe",
+                                "mo",
+                                "mn",
+                                "sr-me",
+                                "my",
+                                "ne",
+                                "pcm",
+                                "nso",
+                                "no",
+                                "nn",
+                                "oc",
+                                "or",
+                                "om",
+                                "ps",
+                                "fa",
+                                "xx-pirate",
+                                "pl",
+                                "pt",
+                                "pt-br",
+                                "pt-pt",
+                                "pa",
+                                "qu",
+                                "ro",
+                                "rm",
+                                "nyn",
+                                "ru",
+                                "gd",
+                                "sr",
+                                "sh",
+                                "st",
+                                "tn",
+                                "crs",
+                                "sn",
+                                "sd",
+                                "si",
+                                "sk",
+                                "sl",
+                                "so",
+                                "es",
+                                "es-419",
+                                "su",
+                                "sw",
+                                "sv",
+                                "tg",
+                                "ta",
+                                "tt",
+                                "te",
+                                "th",
+                                "ti",
+                                "to",
+                                "lua",
+                                "tum",
+                                "tr",
+                                "tk",
+                                "tw",
+                                "ug",
+                                "uk",
+                                "ur",
+                                "uz",
+                                "vu",
+                                "vi",
+                                "cy",
+                                "wo",
+                                "xh",
+                                "yi",
+                                "yo",
+                                "zu"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "cr",
+                        "type": "text",
+                        "label": "`cr` Set Multiple Countries"
+                    },
+                    {
+                        "name": "lr",
+                        "type": "text",
+                        "label": "`lr` Set Multiple Languages"
+                    },
+                    {
+                        "name": "tbs",
+                        "type": "text",
+                        "label": "`tbs` Advanced Search Parameters"
+                    },
+                    {
+                        "name": "safe",
+                        "type": "select",
+                        "label": "`safe` Adult Content Filtering",
+                        "validate": {
+                            "enum": [
+                                "active",
+                                "off"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "nfpr",
+                        "type": "boolean",
+                        "label": "`nfpr` Exclude Auto-corrected Results"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "boolean",
+                        "label": "`filter` Results Filtering"
+                    },
+                    {
+                        "name": "tbm",
+                        "type": "select",
+                        "label": "`tbm` Search Type",
+                        "validate": {
+                            "enum": [
+                                "isch",
+                                "lcl",
+                                "nws",
+                                "shop",
+                                "vid",
+                                "pts"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "device",
+                        "type": "text",
+                        "label": "`device` Device"
+                    },
+                    {
+                        "name": "no_cache",
+                        "type": "boolean",
+                        "label": "`no_cache` Disable Caching"
+                    },
+                    {
+                        "name": "async",
+                        "type": "text",
+                        "label": "`async` Async"
+                    },
+                    {
+                        "name": "output",
+                        "type": "text",
+                        "label": "`output` Output"
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 7,
+            "module": "builtin:BasicFeeder",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "array": "{{6.organic_results}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "array": {
+                            "mode": "edit"
+                        }
+                    }
+                },
+                "expect": [
+                    {
+                        "mode": "edit",
+                        "name": "array",
+                        "spec": [],
+                        "type": "array",
+                        "label": "Array"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 9,
+            "module": "airtable:ActionSearchRecords",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 13734578
+            },
+            "mapper": {
+                "base": "appgyHtu4tSQxWCvz",
+                "table": "tblux7nvqO6Yg9t88",
+                "fields": [
+                    "URL"
+                ],
+                "formula": "AND(\n  {URL} = \"{{7.link}}\",\n  {Run ID} = \"{{1.runId}}\"\n)",
+                "useColumnId": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1200,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "base": {
+                            "mode": "chose",
+                            "label": "Website AI Agent IP Check"
+                        },
+                        "sort": {
+                            "mode": "chose"
+                        },
+                        "view": {
+                            "mode": "chose"
+                        },
+                        "table": {
+                            "mode": "chose",
+                            "label": "Sightings Overview"
+                        },
+                        "fields": {
+                            "mode": "chose",
+                            "label": [
+                                "URL"
+                            ]
+                        },
+                        "maxRecords": {
+                            "empty": true
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection (User ID: usrNZrEbImPW4456n)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:airtable3,airtable2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "base",
+                        "type": "select",
+                        "label": "Base",
+                        "required": true
+                    },
+                    {
+                        "name": "useColumnId",
+                        "type": "boolean",
+                        "label": "Use Column ID",
+                        "required": true
+                    },
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "formula",
+                        "type": "text",
+                        "label": "Formula"
+                    },
+                    {
+                        "name": "maxRecords",
+                        "type": "integer",
+                        "label": "Limit"
+                    },
+                    {
+                        "name": "sort",
+                        "spec": [
+                            {
+                                "name": "field",
+                                "type": "select",
+                                "label": "Field",
+                                "dynamic": true,
+                                "options": []
+                            },
+                            {
+                                "name": "direction",
+                                "type": "select",
+                                "label": "Direction",
+                                "options": [
+                                    {
+                                        "label": "Descending",
+                                        "value": "desc"
+                                    },
+                                    {
+                                        "label": "Ascending",
+                                        "value": "asc"
+                                    }
+                                ]
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Sort"
+                    },
+                    {
+                        "name": "view",
+                        "type": "select",
+                        "label": "View"
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Output Fields",
+                        "multiple": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "ID"
+                    },
+                    {
+                        "name": "createdTime",
+                        "type": "date",
+                        "label": "Created Time"
+                    },
+                    {
+                        "name": "URL",
+                        "type": "text",
+                        "label": "URL"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 8,
+            "module": "airtable:ActionCreateRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 13734578
+            },
+            "filter": {
+                "name": "Create only new URLs",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{9.`__IMTLENGTH__`}}",
+                            "b": "0",
+                            "o": "text:equal"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "base": "appgyHtu4tSQxWCvz",
+                "table": "tblux7nvqO6Yg9t88",
+                "record": {
+                    "fld24tMeYHRktPpOE": "{{7.position}}",
+                    "fldA1pUYhAg5wa8j0": "{{7.snippet}}",
+                    "fldQtvRmicvFyBTHg": "{{6.search_parameters.engine}}",
+                    "fldRofyu3HM0vKm9l": "{{7.title}}",
+                    "fldhVrC1DdCRB9A0X": "{{11.Client}}",
+                    "fldkBNYiJ6n6Ydo91": "{{7.link}}",
+                    "fldnDvVwvNauCfW5T": "{{6.search_parameters.q}}",
+                    "fldrPXMzV82Du1Usp": "processing",
+                    "fldyLgFCy53QELtqa": "{{1.runId}}"
+                },
+                "typecast": false,
+                "useColumnId": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1500,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "base": {
+                            "label": "Website AI Agent IP Check"
+                        },
+                        "table": {
+                            "label": "Sightings Overview",
+                            "nested": [
+                                {
+                                    "name": "record",
+                                    "spec": [
+                                        {
+                                            "name": "fldkBNYiJ6n6Ydo91",
+                                            "type": "text",
+                                            "label": "URL"
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldrPXMzV82Du1Usp",
+                                            "type": "select",
+                                            "label": "Status",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "New",
+                                                    "value": "New"
+                                                },
+                                                {
+                                                    "label": "escalated",
+                                                    "value": "escalated"
+                                                },
+                                                {
+                                                    "label": "Auto Closed",
+                                                    "value": "Auto Closed"
+                                                },
+                                                {
+                                                    "label": "Human Review",
+                                                    "value": "Human Review"
+                                                },
+                                                {
+                                                    "label": "crawl_failed",
+                                                    "value": "crawl_failed"
+                                                },
+                                                {
+                                                    "label": "Review Pending",
+                                                    "value": "Review Pending"
+                                                },
+                                                {
+                                                    "label": "Human Review Needed",
+                                                    "value": "Human Review Needed"
+                                                },
+                                                {
+                                                    "label": "Ready for Client Review",
+                                                    "value": "Ready for Client Review"
+                                                },
+                                                {
+                                                    "label": "Not Relevant",
+                                                    "value": "Not Relevant"
+                                                },
+                                                {
+                                                    "label": "Reviewed Manually",
+                                                    "value": "Reviewed Manually"
+                                                },
+                                                {
+                                                    "label": "processing",
+                                                    "value": "processing"
+                                                },
+                                                {
+                                                    "label": "error",
+                                                    "value": "error"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldQtvRmicvFyBTHg",
+                                            "type": "select",
+                                            "label": "Source",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "google",
+                                                    "value": "google"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldhVrC1DdCRB9A0X",
+                                            "type": "select",
+                                            "label": "Client",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "Vitra",
+                                                    "value": "Vitra"
+                                                },
+                                                {
+                                                    "label": "",
+                                                    "value": ""
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fldfn0yw3CmH9cbCz",
+                                            "type": "boolean",
+                                            "label": "Demo Archieved"
+                                        },
+                                        {
+                                            "name": "fldor2SsDtk0ysKpa",
+                                            "type": "text",
+                                            "label": "Review Agent Output",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "flddP2LuFx4CZW2Ne",
+                                            "type": "select",
+                                            "label": "Infringement Type",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "counterfeit",
+                                                    "value": "counterfeit"
+                                                },
+                                                {
+                                                    "label": "unauthorized_reseller",
+                                                    "value": "unauthorized_reseller"
+                                                },
+                                                {
+                                                    "label": "impersonation",
+                                                    "value": "impersonation"
+                                                },
+                                                {
+                                                    "label": "logo_misuse",
+                                                    "value": "logo_misuse"
+                                                },
+                                                {
+                                                    "label": "copyright_violation",
+                                                    "value": "copyright_violation"
+                                                },
+                                                {
+                                                    "label": "phising_or_scam",
+                                                    "value": "phising_or_scam"
+                                                },
+                                                {
+                                                    "label": "other_brand_abuse",
+                                                    "value": "other_brand_abuse"
+                                                },
+                                                {
+                                                    "label": "not_infringing",
+                                                    "value": "not_infringing"
+                                                },
+                                                {
+                                                    "label": "unclear",
+                                                    "value": "unclear"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fld7RwVPnWNNdTOWe",
+                                            "type": "number",
+                                            "label": "Risk Score"
+                                        },
+                                        {
+                                            "name": "fldkxi92Pb3YM9NmM",
+                                            "type": "number",
+                                            "label": "Confidence Score"
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldDOQ7iChiCrpENy",
+                                            "type": "select",
+                                            "label": "Evidence Strength",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "Weak",
+                                                    "value": "Weak"
+                                                },
+                                                {
+                                                    "label": "Medium",
+                                                    "value": "Medium"
+                                                },
+                                                {
+                                                    "label": "Strong",
+                                                    "value": "Strong"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fldr2Rg7BTev70Tpx",
+                                            "type": "text",
+                                            "label": "Key Signals",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldSIpNZQamuAYs27",
+                                            "type": "text",
+                                            "label": "Reasoning",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldawLOToq7h3dNcA",
+                                            "type": "text",
+                                            "label": "Reasoning Summary",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fld3yMPc1HmAdPX7x",
+                                            "type": "select",
+                                            "label": "Decision",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "Auto Close",
+                                                    "value": "Auto Close"
+                                                },
+                                                {
+                                                    "label": "Human Review",
+                                                    "value": "Human Review"
+                                                },
+                                                {
+                                                    "label": "Escalate",
+                                                    "value": "Escalate"
+                                                },
+                                                {
+                                                    "label": "Collect More Evidence",
+                                                    "value": "Collect More Evidence"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fldoChZ7yoaVlsC9a",
+                                            "type": "boolean",
+                                            "label": "Needs More Evidence"
+                                        },
+                                        {
+                                            "name": "fldnM7ugda7p3xR4Y",
+                                            "type": "text",
+                                            "label": "Decision Version"
+                                        },
+                                        {
+                                            "name": "fldyLgFCy53QELtqa",
+                                            "type": "text",
+                                            "label": "Run ID"
+                                        },
+                                        {
+                                            "name": "fldvVEh10k0XoYpWL",
+                                            "type": "text",
+                                            "label": "Decision Rationale",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldLJOCv8NGLISkPo",
+                                            "type": "select",
+                                            "label": "Recommended Action",
+                                            "dynamic": true,
+                                            "options": [
+                                                {
+                                                    "label": "escalate",
+                                                    "value": "escalate"
+                                                },
+                                                {
+                                                    "label": "human_review",
+                                                    "value": "human_review"
+                                                },
+                                                {
+                                                    "label": "auto_close",
+                                                    "value": "auto_close"
+                                                }
+                                            ],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fldKuVjkGJbYyOHuo",
+                                            "time": true,
+                                            "type": "date",
+                                            "label": "Review Timestamp"
+                                        },
+                                        {
+                                            "name": "fldaRDyUSZU114bjZ",
+                                            "spec": [
+                                                {
+                                                    "help": "Airtable will download the file at the given url and keep its own copy of it.",
+                                                    "name": "url",
+                                                    "type": "text",
+                                                    "label": "File URL"
+                                                },
+                                                {
+                                                    "help": "If empty, Airtable will generate the name automatically.",
+                                                    "name": "filename",
+                                                    "type": "filename",
+                                                    "label": "File name"
+                                                }
+                                            ],
+                                            "type": "array",
+                                            "label": "Screenshot",
+                                            "editable": true
+                                        },
+                                        {
+                                            "name": "fldIb1jeBAZ00gCqT",
+                                            "type": "text",
+                                            "label": "HTML Snippet",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldFmBDxUD0XxYkyI",
+                                            "type": "text",
+                                            "label": "Page Title"
+                                        },
+                                        {
+                                            "name": "fldm2OauCVZasswN8",
+                                            "type": "text",
+                                            "label": "H1"
+                                        },
+                                        {
+                                            "name": "fldNkTeFe5YI4u6xD",
+                                            "type": "text",
+                                            "label": "Meta Description",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldySvzdIJ0x1Zgfc",
+                                            "type": "text",
+                                            "label": "Visible Text Excerpt",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fld8sj72479sfsZyC",
+                                            "type": "text",
+                                            "label": "Price Snippets",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldGWTObx7EVMTFyw",
+                                            "type": "text",
+                                            "label": "Canonical URL"
+                                        },
+                                        {
+                                            "name": "fld8YdzCtyGILD6EI",
+                                            "time": true,
+                                            "type": "date",
+                                            "label": "Evidence Last Captured"
+                                        },
+                                        {
+                                            "name": "fldVIgy8dwrCtx52C",
+                                            "type": "text",
+                                            "label": "Registrar Name"
+                                        },
+                                        {
+                                            "name": "fldJschR6UYu1wgkR",
+                                            "type": "text",
+                                            "label": "Registrant Email"
+                                        },
+                                        {
+                                            "name": "fld9yzPfgtedHkR7b",
+                                            "type": "text",
+                                            "label": "Name Servers",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldRbfX5lP3W2dddZ",
+                                            "type": "text",
+                                            "label": "Detected Text (OCR)",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fldqxlweV9XbYNAG8",
+                                            "type": "select",
+                                            "label": "Takedown Status",
+                                            "dynamic": true,
+                                            "options": [],
+                                            "validate": false
+                                        },
+                                        {
+                                            "mode": "edit",
+                                            "name": "fld3zissrUgvJTcWY",
+                                            "type": "select",
+                                            "label": "Takedown Method",
+                                            "dynamic": true,
+                                            "options": [],
+                                            "validate": false
+                                        },
+                                        {
+                                            "name": "fldYkvzeyb4wwu2md",
+                                            "type": "text",
+                                            "label": "Notes",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fldCrMA5LPwVgqsei",
+                                            "type": "text",
+                                            "label": "Case"
+                                        },
+                                        {
+                                            "name": "fldtjxTvkcIEOWqVP",
+                                            "spec": {
+                                                "label": "Record ID"
+                                            },
+                                            "type": "array",
+                                            "label": "Takedowns"
+                                        },
+                                        {
+                                            "name": "fldRofyu3HM0vKm9l",
+                                            "type": "text",
+                                            "label": "SERP Title"
+                                        },
+                                        {
+                                            "name": "fldA1pUYhAg5wa8j0",
+                                            "type": "text",
+                                            "label": "SERP Snippet",
+                                            "multiline": true
+                                        },
+                                        {
+                                            "name": "fld24tMeYHRktPpOE",
+                                            "type": "number",
+                                            "label": "SERP Position"
+                                        },
+                                        {
+                                            "name": "fldnDvVwvNauCfW5T",
+                                            "type": "text",
+                                            "label": "Keyword Used"
+                                        },
+                                        {
+                                            "name": "fldewhmvHAUWK242u",
+                                            "type": "text",
+                                            "label": "Policy ID Used"
+                                        },
+                                        {
+                                            "name": "fldebVyo5ToCyOVrO",
+                                            "type": "text",
+                                            "label": "Policy Version Used"
+                                        },
+                                        {
+                                            "name": "fld4mSdu785I78XPc",
+                                            "type": "text",
+                                            "label": "Thresholds Used",
+                                            "multiline": true
+                                        }
+                                    ],
+                                    "type": "collection",
+                                    "label": "Record"
+                                }
+                            ]
+                        },
+                        "record": {
+                            "nested": {
+                                "fld3yMPc1HmAdPX7x": {
+                                    "mode": "edit"
+                                },
+                                "fld3zissrUgvJTcWY": {
+                                    "mode": "edit"
+                                },
+                                "fldDOQ7iChiCrpENy": {
+                                    "mode": "edit"
+                                },
+                                "fldLJOCv8NGLISkPo": {
+                                    "mode": "edit"
+                                },
+                                "fldQtvRmicvFyBTHg": {
+                                    "mode": "edit"
+                                },
+                                "fldaRDyUSZU114bjZ": {
+                                    "mode": "chose"
+                                },
+                                "flddP2LuFx4CZW2Ne": {
+                                    "mode": "edit"
+                                },
+                                "fldfn0yw3CmH9cbCz": {
+                                    "mode": "chose"
+                                },
+                                "fldhVrC1DdCRB9A0X": {
+                                    "mode": "edit"
+                                },
+                                "fldoChZ7yoaVlsC9a": {
+                                    "mode": "chose"
+                                },
+                                "fldqxlweV9XbYNAG8": {
+                                    "mode": "edit"
+                                },
+                                "fldrPXMzV82Du1Usp": {
+                                    "mode": "edit"
+                                },
+                                "fldtjxTvkcIEOWqVP": {
+                                    "mode": "chose"
+                                }
+                            }
+                        },
+                        "typecast": {
+                            "mode": "chose"
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection (User ID: usrNZrEbImPW4456n)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:airtable3,airtable2",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "base",
+                        "type": "select",
+                        "label": "Base",
+                        "required": true
+                    },
+                    {
+                        "name": "typecast",
+                        "type": "boolean",
+                        "label": "Smart links",
+                        "required": true
+                    },
+                    {
+                        "name": "useColumnId",
+                        "type": "boolean",
+                        "label": "Use Column ID",
+                        "required": true
+                    },
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "record",
+                        "spec": [
+                            {
+                                "name": "fldkBNYiJ6n6Ydo91",
+                                "type": "text",
+                                "label": "URL"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldrPXMzV82Du1Usp",
+                                "type": "select",
+                                "label": "Status"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldQtvRmicvFyBTHg",
+                                "type": "select",
+                                "label": "Source"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldhVrC1DdCRB9A0X",
+                                "type": "select",
+                                "label": "Client"
+                            },
+                            {
+                                "name": "fldfn0yw3CmH9cbCz",
+                                "type": "boolean",
+                                "label": "Demo Archieved"
+                            },
+                            {
+                                "name": "fldor2SsDtk0ysKpa",
+                                "type": "text",
+                                "label": "Review Agent Output"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "flddP2LuFx4CZW2Ne",
+                                "type": "select",
+                                "label": "Infringement Type"
+                            },
+                            {
+                                "name": "fld7RwVPnWNNdTOWe",
+                                "type": "number",
+                                "label": "Risk Score"
+                            },
+                            {
+                                "name": "fldkxi92Pb3YM9NmM",
+                                "type": "number",
+                                "label": "Confidence Score"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldDOQ7iChiCrpENy",
+                                "type": "select",
+                                "label": "Evidence Strength"
+                            },
+                            {
+                                "name": "fldr2Rg7BTev70Tpx",
+                                "type": "text",
+                                "label": "Key Signals"
+                            },
+                            {
+                                "name": "fldSIpNZQamuAYs27",
+                                "type": "text",
+                                "label": "Reasoning"
+                            },
+                            {
+                                "name": "fldawLOToq7h3dNcA",
+                                "type": "text",
+                                "label": "Reasoning Summary"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld3yMPc1HmAdPX7x",
+                                "type": "select",
+                                "label": "Decision"
+                            },
+                            {
+                                "name": "fldoChZ7yoaVlsC9a",
+                                "type": "boolean",
+                                "label": "Needs More Evidence"
+                            },
+                            {
+                                "name": "fldnM7ugda7p3xR4Y",
+                                "type": "text",
+                                "label": "Decision Version"
+                            },
+                            {
+                                "name": "fldyLgFCy53QELtqa",
+                                "type": "text",
+                                "label": "Run ID"
+                            },
+                            {
+                                "name": "fldvVEh10k0XoYpWL",
+                                "type": "text",
+                                "label": "Decision Rationale"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldLJOCv8NGLISkPo",
+                                "type": "select",
+                                "label": "Recommended Action"
+                            },
+                            {
+                                "name": "fldKuVjkGJbYyOHuo",
+                                "time": true,
+                                "type": "date",
+                                "label": "Review Timestamp"
+                            },
+                            {
+                                "name": "fldaRDyUSZU114bjZ",
+                                "spec": [
+                                    {
+                                        "name": "url",
+                                        "type": "text",
+                                        "label": "File URL"
+                                    },
+                                    {
+                                        "name": "filename",
+                                        "type": "filename",
+                                        "label": "File name"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Screenshot"
+                            },
+                            {
+                                "name": "fldIb1jeBAZ00gCqT",
+                                "type": "text",
+                                "label": "HTML Snippet"
+                            },
+                            {
+                                "name": "fldFmBDxUD0XxYkyI",
+                                "type": "text",
+                                "label": "Page Title"
+                            },
+                            {
+                                "name": "fldm2OauCVZasswN8",
+                                "type": "text",
+                                "label": "H1"
+                            },
+                            {
+                                "name": "fldNkTeFe5YI4u6xD",
+                                "type": "text",
+                                "label": "Meta Description"
+                            },
+                            {
+                                "name": "fldySvzdIJ0x1Zgfc",
+                                "type": "text",
+                                "label": "Visible Text Excerpt"
+                            },
+                            {
+                                "name": "fld8sj72479sfsZyC",
+                                "type": "text",
+                                "label": "Price Snippets"
+                            },
+                            {
+                                "name": "fldGWTObx7EVMTFyw",
+                                "type": "text",
+                                "label": "Canonical URL"
+                            },
+                            {
+                                "name": "fld8YdzCtyGILD6EI",
+                                "time": true,
+                                "type": "date",
+                                "label": "Evidence Last Captured"
+                            },
+                            {
+                                "name": "fldVIgy8dwrCtx52C",
+                                "type": "text",
+                                "label": "Registrar Name"
+                            },
+                            {
+                                "name": "fldJschR6UYu1wgkR",
+                                "type": "text",
+                                "label": "Registrant Email"
+                            },
+                            {
+                                "name": "fld9yzPfgtedHkR7b",
+                                "type": "text",
+                                "label": "Name Servers"
+                            },
+                            {
+                                "name": "fldRbfX5lP3W2dddZ",
+                                "type": "text",
+                                "label": "Detected Text (OCR)"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fldqxlweV9XbYNAG8",
+                                "type": "select",
+                                "label": "Takedown Status"
+                            },
+                            {
+                                "mode": "edit",
+                                "name": "fld3zissrUgvJTcWY",
+                                "type": "select",
+                                "label": "Takedown Method"
+                            },
+                            {
+                                "name": "fldYkvzeyb4wwu2md",
+                                "type": "text",
+                                "label": "Notes"
+                            },
+                            {
+                                "name": "fldCrMA5LPwVgqsei",
+                                "type": "text",
+                                "label": "Case"
+                            },
+                            {
+                                "name": "fldtjxTvkcIEOWqVP",
+                                "spec": {
+                                    "name": "value",
+                                    "label": "Record ID"
+                                },
+                                "type": "array",
+                                "label": "Takedowns"
+                            },
+                            {
+                                "name": "fldRofyu3HM0vKm9l",
+                                "type": "text",
+                                "label": "SERP Title"
+                            },
+                            {
+                                "name": "fldA1pUYhAg5wa8j0",
+                                "type": "text",
+                                "label": "SERP Snippet"
+                            },
+                            {
+                                "name": "fld24tMeYHRktPpOE",
+                                "type": "number",
+                                "label": "SERP Position"
+                            },
+                            {
+                                "name": "fldnDvVwvNauCfW5T",
+                                "type": "text",
+                                "label": "Keyword Used"
+                            },
+                            {
+                                "name": "fldewhmvHAUWK242u",
+                                "type": "text",
+                                "label": "Policy ID Used"
+                            },
+                            {
+                                "name": "fldebVyo5ToCyOVrO",
+                                "type": "text",
+                                "label": "Policy Version Used"
+                            },
+                            {
+                                "name": "fld4mSdu785I78XPc",
+                                "type": "text",
+                                "label": "Thresholds Used"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Record"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "ID"
+                    },
+                    {
+                        "name": "createdTime",
+                        "type": "date",
+                        "label": "Created Time"
+                    },
+                    {
+                        "name": "URL",
+                        "type": "text",
+                        "label": "URL"
+                    },
+                    {
+                        "name": "Status",
+                        "type": "text",
+                        "label": "Status"
+                    },
+                    {
+                        "name": "Source",
+                        "type": "text",
+                        "label": "Source"
+                    },
+                    {
+                        "name": "Client",
+                        "type": "text",
+                        "label": "Client"
+                    },
+                    {
+                        "name": "demo_archived",
+                        "type": "boolean",
+                        "label": "demo_archived"
+                    },
+                    {
+                        "name": "Created",
+                        "type": "date",
+                        "label": "Created"
+                    },
+                    {
+                        "name": "Last Modified",
+                        "type": "date",
+                        "label": "Last Modified"
+                    },
+                    {
+                        "name": "Review Agent Output",
+                        "type": "text",
+                        "label": "Review Agent Output",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Infringement Type",
+                        "type": "text",
+                        "label": "Infringement Type"
+                    },
+                    {
+                        "name": "Risk Score",
+                        "type": "number",
+                        "label": "Risk Score"
+                    },
+                    {
+                        "name": "Confidence Score",
+                        "type": "number",
+                        "label": "Confidence Score"
+                    },
+                    {
+                        "name": "Evidence Strength",
+                        "type": "text",
+                        "label": "Evidence Strength"
+                    },
+                    {
+                        "name": "Key Signals",
+                        "type": "text",
+                        "label": "Key Signals",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Reasoning",
+                        "type": "text",
+                        "label": "Reasoning",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Reasoning Summary",
+                        "type": "text",
+                        "label": "Reasoning Summary",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Decision",
+                        "type": "text",
+                        "label": "Decision"
+                    },
+                    {
+                        "name": "Needs More Evidence",
+                        "type": "boolean",
+                        "label": "Needs More Evidence"
+                    },
+                    {
+                        "name": "Decision Version",
+                        "type": "text",
+                        "label": "Decision Version"
+                    },
+                    {
+                        "name": "Run ID",
+                        "type": "text",
+                        "label": "Run ID"
+                    },
+                    {
+                        "name": "Decision Rationale",
+                        "type": "text",
+                        "label": "Decision Rationale",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Recommended Action",
+                        "type": "text",
+                        "label": "Recommended Action"
+                    },
+                    {
+                        "name": "Review Timestamp",
+                        "time": true,
+                        "type": "date",
+                        "label": "Review Timestamp"
+                    },
+                    {
+                        "name": "Screenshot",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "width",
+                                "type": "uinteger",
+                                "label": "Width"
+                            },
+                            {
+                                "name": "height",
+                                "type": "uinteger",
+                                "label": "Height"
+                            },
+                            {
+                                "name": "url",
+                                "type": "url",
+                                "label": "URL"
+                            },
+                            {
+                                "name": "filename",
+                                "type": "filename",
+                                "label": "File name"
+                            },
+                            {
+                                "name": "size",
+                                "type": "uinteger",
+                                "label": "Size"
+                            },
+                            {
+                                "name": "type",
+                                "type": "text",
+                                "label": "MIME type"
+                            },
+                            {
+                                "name": "thumbnails",
+                                "spec": [
+                                    {
+                                        "name": "small",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Small"
+                                    },
+                                    {
+                                        "name": "large",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Large"
+                                    },
+                                    {
+                                        "name": "full",
+                                        "spec": [
+                                            {
+                                                "name": "url",
+                                                "type": "url",
+                                                "label": "URL"
+                                            },
+                                            {
+                                                "name": "width",
+                                                "type": "uinteger",
+                                                "label": "Width"
+                                            },
+                                            {
+                                                "name": "height",
+                                                "type": "uinteger",
+                                                "label": "Height"
+                                            }
+                                        ],
+                                        "type": "collection",
+                                        "label": "Full"
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "Thumbnails"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Screenshot"
+                    },
+                    {
+                        "name": "HTML Snippet",
+                        "type": "text",
+                        "label": "HTML Snippet",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Page Title",
+                        "type": "text",
+                        "label": "Page Title"
+                    },
+                    {
+                        "name": "H1",
+                        "type": "text",
+                        "label": "H1"
+                    },
+                    {
+                        "name": "Meta Description",
+                        "type": "text",
+                        "label": "Meta Description",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Visible Text Excerpt",
+                        "type": "text",
+                        "label": "Visible Text Excerpt",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Price Snippets",
+                        "type": "text",
+                        "label": "Price Snippets",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Canonical URL",
+                        "type": "text",
+                        "label": "Canonical URL"
+                    },
+                    {
+                        "name": "Evidence Last Captured",
+                        "time": true,
+                        "type": "date",
+                        "label": "Evidence Last Captured"
+                    },
+                    {
+                        "name": "Registrar Name",
+                        "type": "text",
+                        "label": "Registrar Name"
+                    },
+                    {
+                        "name": "Registrant Email",
+                        "type": "text",
+                        "label": "Registrant Email"
+                    },
+                    {
+                        "name": "Name Servers",
+                        "type": "text",
+                        "label": "Name Servers",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Detected Text (OCR)",
+                        "type": "text",
+                        "label": "Detected Text (OCR)",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Takedown Status",
+                        "type": "text",
+                        "label": "Takedown Status"
+                    },
+                    {
+                        "name": "Takedown Method",
+                        "type": "text",
+                        "label": "Takedown Method"
+                    },
+                    {
+                        "name": "Notes",
+                        "type": "text",
+                        "label": "Notes",
+                        "multiline": true
+                    },
+                    {
+                        "name": "Case",
+                        "type": "text",
+                        "label": "Case"
+                    },
+                    {
+                        "name": "Takedowns",
+                        "spec": {
+                            "label": "Record ID"
+                        },
+                        "type": "array",
+                        "label": "Takedowns"
+                    },
+                    {
+                        "name": "SERP Title",
+                        "type": "text",
+                        "label": "SERP Title"
+                    },
+                    {
+                        "name": "SERP Snippet",
+                        "type": "text",
+                        "label": "SERP Snippet",
+                        "multiline": true
+                    },
+                    {
+                        "name": "SERP Position",
+                        "type": "number",
+                        "label": "SERP Position"
+                    },
+                    {
+                        "name": "Keyword Used",
+                        "type": "text",
+                        "label": "Keyword Used"
+                    },
+                    {
+                        "name": "Policy ID Used",
+                        "type": "text",
+                        "label": "Policy ID Used"
+                    },
+                    {
+                        "name": "Policy Version Used",
+                        "type": "text",
+                        "label": "Policy Version Used"
+                    },
+                    {
+                        "name": "Thresholds Used",
+                        "type": "text",
+                        "label": "Thresholds Used",
+                        "multiline": true
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu2.make.com",
+        "notes": []
+    }
+}
