@@ -1,49 +1,50 @@
-# Make.com Blueprints
+# Make.com Blueprints — Archived
 
-Dieses Verzeichnis enthält die sechs Make.com Szenarien als exportierte JSON-Blueprints.
+> **These blueprints are no longer used.**  
+> The logic from all 6 scenarios has been migrated to native Node.js jobs in `web-app/server/`.  
+> Make.com is no longer required to run this system.
 
-## Reihenfolge & Abhängigkeiten
+The JSON files are kept here as historical reference and documentation.
 
-```
-[Nutzer] → Start Search (03) → URL Importer (02) → [Airtable: Sightings]
-                                                          ↓
-                                              AI Worker V1.2.2 (06)  ← aktiv
-                                              AI Worker V1.2.1 (05)  ← Fallback (ScrapingBee)
-                                                          ↓
-                                              [Airtable: KI-Ergebnis]
-                                                          ↑
-                              Get Results (04) ←──────────┘
-[Nutzer] ← Get Results (04)
-[Web App] → Airtable Get Options (01) → [Airtable: Search Setup Keywords]
-```
+---
 
-## Import-Anleitung
+## What replaced what
 
-1. **Make.com öffnen** → [make.com](https://make.com) → Login
-2. **Scenarios** → **Create a new scenario**
-3. Unten links: **Import Blueprint** klicken
-4. JSON-Datei auswählen und bestätigen
-5. Webhooks und Verbindungen (Airtable, SerpAPI, Gemini) neu verknüpfen
-
-**Reihenfolge beim Import:**
-1. `01-airtable-get-options.json` — liefert Keyword-Setups ans Web-App-Backend
-2. `02-url-importer.json` — führt Google-Suche via SerpAPI durch, schreibt URLs nach Airtable
-3. `03-start-search.json` — generiert runId (UUID), triggert URL Importer
-4. `04-get-results.json` — liest Sightings aus Airtable nach runId
-5. `06-ai-worker-v1.2.2-scraping-alt.json` — **aktiver AI Worker**: direkter HTTP-Scrape + /api/extract + Gemini 2.5 Flash
-6. `05-ai-worker-v1.2.1-scrapingbee.json` — ältere Version mit ScrapingBee (Fallback)
-
-## Wichtige Webhooks verknüpfen
-
-Nach dem Import musst du folgende Webhook-URLs in die `.env` der Web App eintragen:
-
-| Blueprint | Webhook-Variable in .env |
+| Make.com Scenario | Replaced by |
 |---|---|
-| 03-start-search | `START_SEARCH_URL` + `MAKE_START_SEARCH_URL` |
-| 04-get-results | `GET_RESULTS_URL` + `MAKE_GET_RESULTS_URL` |
-| 01-airtable-get-options | Hardcoded in `server/routes.ts` → `api.search.options` |
+| 01 Airtable Get Options | `server/routes.ts` → `getActiveKeywords()` in `server/airtable.ts` |
+| 02 URL Importer | `server/jobs/urlImporter.ts` → `searchGoogle()` + `createSighting()` |
+| 03 Start Search | `POST /api/search/start` in `server/routes.ts` — generates UUID, fires background job |
+| 04 Get Results | `GET /api/search/results/:runId` in `server/routes.ts` → `getSightingsByRunId()` |
+| 05 AI Worker V1.2.1 (ScrapingBee) | `server/jobs/aiWorker.ts` — direct HTTP scrape via `extractUrl()` |
+| 06 AI Worker V1.2.2 (active) | `server/jobs/aiWorker.ts` + `server/gemini.ts` |
 
-## API-Key in Make.com
+## New architecture
 
-Der `MAKE_API_KEY` wird vom Web-App-Backend als `X-Make-ApiKey` Header gesetzt.  
-In Make.com: **Organization Settings** → **API** → API Key kopieren.
+```
+Web App → Airtable REST API  (direct, no middleman)
+Web App → SerpAPI REST API   (direct)
+Web App → Gemini API         (via @google/generative-ai SDK)
+```
+
+## Required environment variables
+
+```
+AIRTABLE_TOKEN=your_airtable_personal_access_token
+AIRTABLE_BASE_ID=appgyHtu4tSQxWCvz
+SERPAPI_KEY=your_serpapi_key
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+See `.env.example` in the repo root.
+
+---
+
+## Original blueprint files (for reference)
+
+- `01-airtable-get-options.json`
+- `02-url-importer.json`
+- `03-start-search.json`
+- `04-get-results.json`
+- `05-ai-worker-v1.2.1-scrapingbee.json`
+- `06-ai-worker-v1.2.2-scraping-alt.json`

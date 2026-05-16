@@ -1,15 +1,24 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 
-const REQUIRED_ENV = ["MAKE_API_KEY", "MAKE_START_SEARCH_URL", "MAKE_GET_RESULTS_URL"] as const;
+const MOCK = process.env.MOCK_MODE === "true";
 
-for (const key of REQUIRED_ENV) {
-  if (!process.env[key]) {
-    console.error(`[startup] Missing required environment variable: ${key}`);
-    process.exit(1);
+if (!MOCK) {
+  const REQUIRED_ENV = ["AIRTABLE_TOKEN", "AIRTABLE_BASE_ID", "SERPAPI_KEY", "GEMINI_API_KEY"];
+  for (const key of REQUIRED_ENV) {
+    if (!process.env[key]) {
+      console.error(`[startup] Missing required environment variable: ${key}`);
+      console.error(`[startup] Tip: set MOCK_MODE=true to run without external API keys`);
+      process.exit(1);
+    }
   }
+}
+
+if (MOCK) {
+  console.log("[startup] MOCK_MODE=true — running with demo data, no external APIs called");
 }
 
 const app = express();
