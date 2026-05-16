@@ -120,6 +120,26 @@ For AI Worker V1.2.2, the `/api/extract` endpoint URL in Make.com scenario 06 mu
 
 ---
 
+## Local Development / Demo Mode
+
+The app ships with a **Mock Mode** that runs entirely without a Make.com subscription, SerpAPI key, or Airtable account — useful for local development, demos, or UI testing.
+
+**Enable it:**
+
+```bash
+# web-app/.env
+MOCK_MODE=true
+```
+
+When `MOCK_MODE=true`:
+- `/api/search/options` returns two pre-configured clients (*Acme Sports*, *LuxBrand*) with realistic products and keywords
+- `/api/search/start` returns a mock `runId` instantly without calling Make.com
+- `/api/search/results/:runId` returns a set of realistic sightings with mixed Risk Scores, Infringement Types, and Reasoning Summaries
+
+All other environment variables (`MAKE_API_KEY`, webhook URLs) are ignored in mock mode and do not need to be set.
+
+---
+
 ## API Reference
 
 ### `GET /api/search/options`

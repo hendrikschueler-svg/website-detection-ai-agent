@@ -5,6 +5,9 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { callMakeWebhook } from "./makeWebhook";
 import { handleExtract } from "./extract";
+import { mockSetups, mockSightings, mockRunStore } from "./mockData";
+
+const MOCK = process.env.MOCK_MODE === "true";
 
 const resultsCache = new Map<string, any>();
 
@@ -41,6 +44,14 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // GET /api/search/options — fetches available client/product/keyword setups from Make.com
   app.get(api.search.options.path, async (req, res) => {
+    if (MOCK) {
+      const clients = [...new Set(mockSetups.map(s => s.Client))].sort();
+      const products = [...new Set(mockSetups.map(s => s["Product Name"]))].sort();
+      const keywords = [...new Set(mockSetups.map(s => s.Keyword))].sort();
+      res.set("Cache-Control", "no-store");
+      return res.json({ clients, products, keywords, setups: mockSetups });
+    }
+
     try {
       const webhookUrl = "https://hook.eu2.make.com/sqiybon7alox68feu70fdiiulb4fsuvq";
       const apiKey = process.env.MAKE_API_KEY!;
@@ -66,6 +77,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // POST /api/search/start — triggers Make.com Start Search scenario, returns runId
   app.post(api.search.start.path, async (req, res) => {
+    if (MOCK) {
+      const { setupRecordId } = req.body;
+      const runId = `mock-run-${Date.now()}`;
+      mockRunStore.set(runId, setupRecordId ?? "");
+      return res.json({ runId });
+    }
+
     try {
       const input = api.search.start.input.parse(req.body);
       const webhookUrl = process.env.START_SEARCH_URL!;
@@ -88,6 +106,15 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // GET /api/search/results/:runId — polls Make.com for AI analysis results
   app.get(api.search.results.path, async (req, res) => {
+    if (MOCK) {
+      const { runId } = req.params;
+      const setupRecordId = mockRunStore.get(runId);
+      const results = setupRecordId && mockSightings[setupRecordId]
+        ? mockSightings[setupRecordId]
+        : Object.values(mockSightings).flat();
+      return res.json({ results });
+    }
+
     try {
       const { runId } = req.params;
       const webhookUrl = process.env.GET_RESULTS_URL!;
@@ -149,7 +176,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
-  app.get("/api/health", (_req, res) => res.json({ ok: true }));
+  app.get("/api/health", (_req, res) => res.json({ ok: true, mock: MOCK }));
 
   // POST /api/extract — scrapes a URL and returns visible text + diagnostics for Gemini
   app.post("/api/extract", handleExtract);
