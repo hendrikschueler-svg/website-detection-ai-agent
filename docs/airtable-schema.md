@@ -59,3 +59,14 @@ Enthält die Gemini-Prompts und Scoring-Regeln für den AI Worker.
 | `Min Risk Score` | Number | Schwellwert ab dem "Takedown Recommended" gesetzt wird |
 
 > Die Tabelle ermöglicht Prompt-Versionierung ohne Code-Änderungen.
+
+### Planned fields — not yet implemented
+
+The following fields are planned for a future version to enable cleaner per-client risk configuration without editing prompt text:
+
+| Field | Type | Description |
+|---|---|---|
+| `escalate_threshold` | Number (0–100) | Risk Score above which the agent recommends escalation. Default: 80. |
+| `auto_close_threshold` | Number (0–100) | Risk Score below which the agent auto-closes as clean. Default: 20. |
+
+Once implemented, these will replace free-text threshold instructions in the `System Prompt` field.
