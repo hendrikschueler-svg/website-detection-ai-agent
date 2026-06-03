@@ -91,6 +91,7 @@
     "vite": "^7.3.0"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.8"
+    "bufferutil": "^4.0.8",
+    "puppeteer": "^22.0.0"
   }
 }

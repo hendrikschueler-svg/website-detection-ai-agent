@@ -6,9 +6,18 @@ const SidebarContext = React.createContext<{ open: boolean; setOpen: (v: boolean
   setOpen: () => {},
 })
 
-function SidebarProvider({ children, defaultOpen = true }: { children: React.ReactNode; defaultOpen?: boolean }) {
+interface SidebarProviderProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}
+
+function SidebarProvider({ children, defaultOpen = true, ...divProps }: SidebarProviderProps) {
   const [open, setOpen] = React.useState(defaultOpen)
-  return <SidebarContext.Provider value={{ open, setOpen }}>{children}</SidebarContext.Provider>
+  return (
+    <SidebarContext.Provider value={{ open, setOpen }}>
+      <div {...divProps}>{children}</div>
+    </SidebarContext.Provider>
+  )
 }
 
 function useSidebar() {
