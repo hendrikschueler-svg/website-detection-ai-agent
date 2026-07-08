@@ -3975,7 +3975,7 @@
                 "queryParameters": [
                     {
                         "name": "key",
-                        "value": "REDACTED_ROTATED_KEY"
+                        "value": "YOUR_GEMINI_API_KEY"
                     }
                 ],
                 "stopOnHttpError": true,

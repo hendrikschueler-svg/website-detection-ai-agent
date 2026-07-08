@@ -1284,7 +1284,7 @@
                 "queryParameters": [
                     {
                         "name": "api_key",
-                        "value": "GJM7UPLGPGWOMKTE9897CXSM3UMDW35G6G5A006BRJD7FE45ZP2A1IJLAEFGVRCV5TXQPMB26AMKX7KF"
+                        "value": "YOUR_SCRAPINGBEE_API_KEY"
                     },
                     {
                         "name": "url",
@@ -3790,7 +3790,7 @@
                 "queryParameters": [
                     {
                         "name": "key",
-                        "value": "REDACTED_ROTATED_KEY"
+                        "value": "YOUR_GEMINI_API_KEY"
                     }
                 ],
                 "stopOnHttpError": true,
