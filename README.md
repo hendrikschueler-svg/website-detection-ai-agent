@@ -29,7 +29,13 @@ An AI-powered tool for automatically detecting IP infringements on websites. The
                    └──────────────────┘
 ```
 
-**Make.com is no longer required.** All logic runs natively in Node.js. See [`make-blueprints/README.md`](make-blueprints/README.md) for the migration reference.
+**Make.com is no longer required.** All logic runs natively in Node.js.
+
+---
+
+## Previous Architecture
+
+This project originally ran on Make.com scenarios (no-code orchestration of Airtable, SerpAPI, and Gemini). Migrated to native Node.js integration in July 2026 for direct control over agent logic and tool calling. The original blueprints are kept for reference in [`legacy/`](legacy/).
 
 ---
 

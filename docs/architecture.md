@@ -87,7 +87,6 @@ Das Website Detection System erkennt automatisch potenzielle IP-Verletzungen auf
 |---|---|
 | `index.ts` | Express-Setup, Env-Validierung, Vite-Dev-Server |
 | `routes.ts` | Alle API-Endpunkte registrieren |
-| `makeWebhook.ts` | Make.com HTTP-Helper mit JSON-Workaround |
 | `extract.ts` | `/api/extract` — HTTP-Scrape + Cheerio-Parsing |
 | `storage.ts` | Stub (In-Memory, keine DB) |
 | `static.ts` | Production Static File Serving |
